@@ -1,6 +1,7 @@
 package com.example.anton.android2hw1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -11,10 +12,18 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private SharedPreferences sharedPreferences;
+    private ArrayList<Person> persons;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +33,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        List<Person> persons = new ArrayList<>();
+       /* persons = new ArrayList<>();
         persons.add(new Person("Arnold","Shwarznegger", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
         persons.add(new Person("Bruce", "Willas","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
         persons.add(new Person("Sylverster", "Stallone", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
+        */
 
+        loadPersons();
         ListAdapter personAdapter = new PersonAdapter(this, persons);
 
         ListView mainList = (ListView)findViewById(R.id.mainList);
@@ -68,4 +79,18 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddBiography.class );
         startActivity(intent);
     }
+
+    public void loadPersons(){
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("persons", null);
+        Type type = new TypeToken<ArrayList<Person>>(){}.getType();
+        persons = gson.fromJson(json, type);
+
+        if (persons == null){
+            persons = new ArrayList<>();
+        }
+    }
+
+
 }
