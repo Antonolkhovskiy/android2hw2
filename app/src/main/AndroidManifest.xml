@@ -17,6 +17,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddBiography"></activity>
+        <provider
+            android:name="PersonsProvider"
+            android:authorities="com.example.anton.android2hw1"
+            />
     </application>
 
 </manifest>
