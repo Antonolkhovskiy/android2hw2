@@ -16,11 +16,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddBiography"></activity>
+        <activity android:name=".AddBiography"
+            android:parentActivityName=".MainActivity"/>
+
         <provider
-            android:name="PersonsProvider"
-            android:authorities="com.example.anton.android2hw1"
-            />
+            android:name=".PersonsProvider"
+            android:authorities="com.example.anton.android2hw1" />
+
+        <activity android:name=".ShowFullBio"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

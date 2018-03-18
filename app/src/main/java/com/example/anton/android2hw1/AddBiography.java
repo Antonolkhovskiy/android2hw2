@@ -1,10 +1,14 @@
 package com.example.anton.android2hw1;
 
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,6 +24,8 @@ public class AddBiography extends AppCompatActivity {
     private Button buttonSave;
     private SharedPreferences sharedPreferences;
     private ArrayList<Person> persons;
+    private Person person;
+    private PersonsProvider personsProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +37,52 @@ public class AddBiography extends AppCompatActivity {
         biography_input = (EditText) findViewById(R.id.biography_input);
         buttonSave = (Button) findViewById(R.id.buttonSave);
 
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addPerson();
+            }
+        });
 
 
 
 
     }
 
+    /*   public void onClickAddName(View view) {
+      // Add a new student record
+      ContentValues values = new ContentValues();
+      values.put(StudentsProvider.NAME,
+         ((EditText)findViewById(R.id.editText2)).getText().toString());
+
+      values.put(StudentsProvider.GRADE,
+         ((EditText)findViewById(R.id.editText3)).getText().toString());
+
+      Uri uri = getContentResolver().insert(
+         StudentsProvider.CONTENT_URI, values);
+
+      Toast.makeText(getBaseContext(),
+         uri.toString(), Toast.LENGTH_LONG).show();
+   }*/
+
+
+
     public void addPerson(){
         String fName = first_name_input.getText().toString();
         String lName = last_name_input.getText().toString();
         String bio = biography_input.getText().toString();
 
-        Person person = new Person(fName, lName, bio);
+        ContentValues contentValues = new ContentValues();
 
-        persons.add(person);
+        contentValues.put(PersonsProvider.FIRST_NAME, fName);
+        contentValues.put(PersonsProvider.LAST_NAME, lName);
+        contentValues.put(PersonsProvider.BIOGRAPHY, bio);
+
+        Uri uri = getContentResolver().insert(
+                PersonsProvider.CONTENT_URI, contentValues);
+
+        Toast.makeText(getBaseContext(),
+                uri.toString(), Toast.LENGTH_LONG).show();
 
     }
 

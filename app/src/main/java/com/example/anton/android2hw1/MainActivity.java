@@ -2,12 +2,16 @@ package com.example.anton.android2hw1;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private ArrayList<Person> persons;
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
+    public static final String FULL_BIO = "fullBio";
+    public static final String PERSON_SELECTED = "selected_person";
 
 
     @Override
@@ -32,21 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        persons = new ArrayList<>();
 
-       /* persons = new ArrayList<>();
-        persons.add(new Person("Arnold","Shwarznegger", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-        persons.add(new Person("Bruce", "Willas","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-        persons.add(new Person("Sylverster", "Stallone", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-        */
-
-        loadPersons();
-        ListAdapter personAdapter = new PersonAdapter(this, persons);
-
-        ListView mainList = (ListView)findViewById(R.id.mainList);
-
-        mainList.setAdapter(personAdapter);
-
-
+        buildListView();
 
     }
 
@@ -79,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddBiography.class );
         startActivity(intent);
     }
+/*
+    public void activityFullBio(int index){
+        Intent intent = new Intent(this, ShowFullBio.class);
+    }
+
 
     public void loadPersons(){
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
@@ -91,6 +92,50 @@ public class MainActivity extends AppCompatActivity {
             persons = new ArrayList<>();
         }
     }
+*/
 
+    public void retrieveAndShowPersons() {
+        String URL = "content://com.example.anton.android2hw1";
+        Uri students = Uri.parse(URL);
+        Cursor c = managedQuery(students, null, null, null, "first_name");
+
+        if (c.moveToFirst()) {
+            do {
+                Person person = new Person(c.getString(c.getColumnIndex(PersonsProvider.FIRST_NAME))
+                        ,c.getString(c.getColumnIndex(PersonsProvider.LAST_NAME))
+                        ,c.getString(c.getColumnIndex(PersonsProvider.BIOGRAPHY)));
+                persons.add(person);
+
+
+            } while (c.moveToNext());
+
+
+        }
+    }
+
+    public void buildListView(){
+        retrieveAndShowPersons();
+        ListAdapter personAdapter = new PersonAdapter(this, persons);
+        ListView mainList = (ListView)findViewById(R.id.mainList);
+        mainList.setAdapter(personAdapter);
+
+        mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MainActivity.this, ShowFullBio.class);
+                Person personSelected = persons.get(i);
+                intent.putExtra(FIRST_NAME, personSelected.getFirstName());
+                intent.putExtra(LAST_NAME, personSelected.getLastName());
+                intent.putExtra(FULL_BIO, personSelected.getPersonBiography());
+
+                startActivity(intent);
+
+            }
+        });
+
+
+
+    }
 
 }
