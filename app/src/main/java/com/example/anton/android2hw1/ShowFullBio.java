@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 public class ShowFullBio extends AppCompatActivity {
@@ -33,5 +36,26 @@ public class ShowFullBio extends AppCompatActivity {
         showBio.setText(biography);
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.option_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.addItem: {
+                Intent intent = new Intent(this, AddBiography.class );
+                startActivity(intent);
+                return true;
+            }
+            default:{
+                return super.onOptionsItemSelected(item);
+            }
+        }
     }
 }

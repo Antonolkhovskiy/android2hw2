@@ -30,13 +30,22 @@ public class MainActivity extends AppCompatActivity {
     public static final String FIRST_NAME = "first_name";
     public static final String LAST_NAME = "last_name";
     public static final String FULL_BIO = "fullBio";
-    public static final String PERSON_SELECTED = "selected_person";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        boolean finished = sharedPreferences.getBoolean("finished", true);
+
+        if(finished == false){
+            Intent intent = new Intent(this, AddBiography.class);
+            startActivity(intent);
+        }
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,10 +69,6 @@ public class MainActivity extends AppCompatActivity {
                 activityAdd();
                 return true;
             }
-            case R.id.exitItem: {
-                Toast.makeText(this,"exit  Item", Toast.LENGTH_SHORT).show();
-                return true;
-            }
             default:{
                 return super.onOptionsItemSelected(item);
             }
@@ -75,24 +80,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddBiography.class );
         startActivity(intent);
     }
-/*
-    public void activityFullBio(int index){
-        Intent intent = new Intent(this, ShowFullBio.class);
-    }
 
-
-    public void loadPersons(){
-        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("persons", null);
-        Type type = new TypeToken<ArrayList<Person>>(){}.getType();
-        persons = gson.fromJson(json, type);
-
-        if (persons == null){
-            persons = new ArrayList<>();
-        }
-    }
-*/
 
     public void retrieveAndShowPersons() {
         String URL = "content://com.example.anton.android2hw1";

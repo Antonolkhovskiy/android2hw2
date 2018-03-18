@@ -1,6 +1,7 @@
 package com.example.anton.android2hw1;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-
 public class AddBiography extends AppCompatActivity {
 
     private EditText first_name_input;
@@ -23,9 +18,8 @@ public class AddBiography extends AppCompatActivity {
     private EditText biography_input;
     private Button buttonSave;
     private SharedPreferences sharedPreferences;
-    private ArrayList<Person> persons;
-    private Person person;
-    private PersonsProvider personsProvider;
+    private SharedPreferences.Editor editor;
+    private boolean flag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +31,17 @@ public class AddBiography extends AppCompatActivity {
         biography_input = (EditText) findViewById(R.id.biography_input);
         buttonSave = (Button) findViewById(R.id.buttonSave);
 
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        boolean finished = sharedPreferences.getBoolean("finished", true);
+
+        Toast.makeText(this, String.valueOf(finished) + "   asdasdasdasdas", Toast.LENGTH_LONG);
+
+        if(finished == false){
+            contBio();
+        }
+
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,26 +51,13 @@ public class AddBiography extends AppCompatActivity {
 
 
 
-
     }
 
-    /*   public void onClickAddName(View view) {
-      // Add a new student record
-      ContentValues values = new ContentValues();
-      values.put(StudentsProvider.NAME,
-         ((EditText)findViewById(R.id.editText2)).getText().toString());
-
-      values.put(StudentsProvider.GRADE,
-         ((EditText)findViewById(R.id.editText3)).getText().toString());
-
-      Uri uri = getContentResolver().insert(
-         StudentsProvider.CONTENT_URI, values);
-
-      Toast.makeText(getBaseContext(),
-         uri.toString(), Toast.LENGTH_LONG).show();
-   }*/
-
-
+    @Override
+    protected void onPause() {
+        saveIncompletedBio();
+        super.onPause();
+    }
 
     public void addPerson(){
         String fName = first_name_input.getText().toString();
@@ -81,31 +73,39 @@ public class AddBiography extends AppCompatActivity {
         Uri uri = getContentResolver().insert(
                 PersonsProvider.CONTENT_URI, contentValues);
 
-        Toast.makeText(getBaseContext(),
-                uri.toString(), Toast.LENGTH_LONG).show();
+        editor.clear().commit();
+        editor.putBoolean("finished", true);
+        editor.commit();
+        flag = false;
+
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
 
     }
 
-    public void savePersons(){
-        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(persons);
-        editor.putString("persons", json);
-        editor.apply();
-    }
+   public void contBio(){
+        String fName = sharedPreferences.getString("fname", "john");
+        String lName = sharedPreferences.getString("lname", "smith");
+        String bio = sharedPreferences.getString("bio", "cool guy");
 
-    public void loadPersons(){
-        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("persons", null);
-        Type type = new TypeToken<ArrayList<Person>>(){}.getType();
-        persons = gson.fromJson(json, type);
+        first_name_input.setText(fName);
+        last_name_input.setText(lName);
+        biography_input.setText(bio);
+   }
 
-        if (persons == null){
-            persons = new ArrayList<>();
-        }
-    }
+   public void saveIncompletedBio(){
+       String fname = first_name_input.getText().toString();
+       String lname = last_name_input.getText().toString();
+       String bio = biography_input.getText().toString();
+       if(flag){
+           editor.putBoolean("finished", false);
+           editor.putString("fname", fname);
+           editor.putString("lname", lname);
+           editor.putString("bio", bio);
+           editor.commit();
+       }
+
+   }
 
 
 
