@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
 public class AddBiography extends AppCompatActivity {
 
     private EditText first_name_input;
@@ -35,8 +33,6 @@ public class AddBiography extends AppCompatActivity {
         editor = sharedPreferences.edit();
 
         boolean finished = sharedPreferences.getBoolean("finished", true);
-
-        Toast.makeText(this, String.valueOf(finished) + "   asdasdasdasdas", Toast.LENGTH_LONG);
 
         if(finished == false){
             contBio();
